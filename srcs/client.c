@@ -14,12 +14,11 @@
 
 volatile sig_atomic_t	g_signal_received = 0;
 
-void	signal_handler(int sig)
+void	signal_handler_s(int sig)
 {
 	if (sig == SIGUSR1)
 	{
 		g_signal_received = 1;
-		ft_putstr_fd("Signal received by server\n", 1);
 	}
 }
 
@@ -71,7 +70,7 @@ int	main(int ac, char **av)
 		return (1);
 	}
 	i = 0;
-	signal(SIGUSR1, signal_handler);
+	signal(SIGUSR1, signal_handler_s);
 	while (av[2][i] != '\0')
 	{
 		bit_handler(pid, av[2][i]);

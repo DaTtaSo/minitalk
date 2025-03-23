@@ -33,10 +33,10 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 		ft_putchar_fd(c, 1);
 		if (c == '\0')
 			ft_putchar_fd('\n', 1);
-		kill(info->si_pid, SIGUSR1);
 		bit = 0;
 		c = 0;
 	}
+		kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)
