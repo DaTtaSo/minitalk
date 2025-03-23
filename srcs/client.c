@@ -22,6 +22,12 @@ void	signal_handler_s(int sig)
 	}
 }
 
+void	error_signal(void)
+{
+	ft_putendl_fd("Error while sending signal", 2);
+	exit(1);
+}
+
 void	bit_handler(int pid, char c)
 {
 	int	bit;
@@ -34,16 +40,14 @@ void	bit_handler(int pid, char c)
 		{
 			if (kill(pid, SIGUSR1) == -1)
 			{
-				ft_putendl_fd("Error while sending SIGUSR1", 2);
-				exit(1);
+				error_signal(void);
 			}
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
 			{
-				ft_putendl_fd("Error while sending SIGUSR2", 2);
-				exit(1);
+				error_signal(void);
 			}
 		}
 		while (!g_signal_received)

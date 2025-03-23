@@ -36,7 +36,7 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 		bit = 0;
 		c = 0;
 	}
-		kill(info->si_pid, SIGUSR1);
+	kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)

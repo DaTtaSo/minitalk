@@ -16,4 +16,13 @@
 # include <signal.h>
 # include "./libft/libft.h"
 
+/*client.c*/
+void	bit_handler(int pid, char c);
+void	error_signal(void);
+void	signal_handler_s(int sig);
+
+/*server.c*/
+void	signal_handler(int sig, siginfo_t *info, void *context);
+void	terminate(int sig);
+
 #endif
