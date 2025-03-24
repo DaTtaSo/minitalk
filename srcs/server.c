@@ -12,29 +12,75 @@
 
 #include "../includes/minitalk.h"
 
-void	terminate(int sig)
+void	filler(int sig, int *bit, char *str)
 {
-	(void)sig;
-	ft_putstr_fd("\nServer terminated\n", 1);
-	exit(0);
+	static char	c = 0;
+
+	if (sig == SIGUSR1)
+		c |= (1 << (7 - *bit));
+	(*bit)++;
+	if (*bit == 8)
+	{
+		ft_strcat(str, c);
+		*bit = 0;
+		c = 0;
+	}
+}
+
+void	get_len(int sig, int *bit, int *len, int *received)
+{
+	if (sig == SIGUSR1)
+		*len |= 1 << *bit;
+	(*bit)++;
+	if (*bit == 32)
+	{
+		*bit = 0;
+		*received = 1;
+	}
+}
+
+void	print_reset(char **str, int *bit, int *len, int *received)
+{
+	ft_putendl_fd(*str, 1);
+	*bit = 0;
+
+	*len = 0;
+	*received = 0;
+	free(*str);
+	*str = NULL;
 }
 
 void	signal_handler(int sig, siginfo_t *info, void *context)
 {
 	static int	bit = 0;
-	static char	c = 0;
+	static int	received = 0;
+	static int	len = 0;
+	static char	*str = NULL;
+	static int	char_count = 0;
 
 	(void)context;
-	if (sig == SIGUSR1)
-		c |= (1 << (7 - bit));
-	bit++;
-	if (bit == 8)
+	if (received == 0)
 	{
-		ft_putchar_fd(c, 1);
-		if (c == '\0')
-			ft_putchar_fd('\n', 1);
-		bit = 0;
-		c = 0;
+		get_len(sig, &bit, &len, &received);
+		if (received == 1)
+		{
+			str = ft_calloc(len + 1, sizeof(char));
+			if (str == NULL)
+				exit(1);
+		}
+	}
+	else if (str != NULL)
+	{
+		filler(sig, &bit, str);
+		if (bit == 0 && received)
+		{
+			char_count++;
+			if (char_count == len)
+			{
+				print_reset(&str, &bit, &len, &received);
+				char_count = 0;
+			}
+		}
 	}
 	kill(info->si_pid, SIGUSR1);
 }

@@ -14,52 +14,78 @@
 
 volatile sig_atomic_t	g_signal_received = 0;
 
-void	signal_handler_s(int sig)
+void	signal_received(int sig)
 {
 	if (sig == SIGUSR1)
 	{
-		g_signal_received = 1;
+		__atomic_store_n(&g_signal_received, 1, __ATOMIC_RELEASE);
 	}
 }
 
 void	error_signal(void)
 {
-	ft_putendl_fd("Error while sending signal", 2);
+	ft_putendl_fd("Error", 2);
 	exit(1);
 }
 
-void	bit_handler(int pid, char c)
+void	send_len(int pid, int len)
 {
-	int	bit;
+	int	i;
 
-	bit = 7;
-	while (bit >= 0)
+	i = 0;
+	while (i < 32)
 	{
 		g_signal_received = 0;
-		if ((c & (1 << bit)) != 0)
+		if ((len & (1 << i)) != 0)
 		{
 			if (kill(pid, SIGUSR1) == -1)
-			{
-				error_signal(void);
-			}
+				error_signal();
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-			{
-				error_signal(void);
-			}
+				error_signal();
 		}
-		while (!g_signal_received)
+		while (!__atomic_load_n(&g_signal_received, __ATOMIC_ACQUIRE))
 			usleep(100);
-		bit--;
+		i++;
+	}
+}
+
+void	send_char(int pid, char *str)
+{
+	int	bit;
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		bit = 7;
+		while (bit >= 0)
+		{
+			g_signal_received = 0;
+			if ((str[i] & (1 << bit)) != 0)
+			{
+				if (kill(pid, SIGUSR1) == -1)
+					error_signal();
+			}
+			else
+			{
+				if (kill(pid, SIGUSR2) == -1)
+					error_signal();
+			}
+			while (!__atomic_load_n(&g_signal_received, __ATOMIC_ACQUIRE))
+				usleep(100);
+			bit--;
+		}
+		i++;
 	}
 }
 
 int	main(int ac, char **av)
 {
-	int	pid;
-	int	i;
+	int					pid;
+	struct sigaction	sa;
 
 	if (ac != 3 || !ft_strlen(av[2]))
 	{
@@ -73,13 +99,11 @@ int	main(int ac, char **av)
 		ft_putendl_fd("invalid PID, must be greater than 1", 2);
 		return (1);
 	}
-	i = 0;
-	signal(SIGUSR1, signal_handler_s);
-	while (av[2][i] != '\0')
-	{
-		bit_handler(pid, av[2][i]);
-		i++;
-	}
-	bit_handler(pid, '\0');
+	sa.sa_handler = signal_received;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGUSR1, &sa, NULL);
+	send_len(pid, ft_strlen(av[2]));
+	send_char(pid, av[2]);
 	return (0);
 }

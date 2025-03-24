@@ -16,7 +16,8 @@ SRCS_DIR			=			srcs/
 
 FILE_CL				=			client
 
-FILE_SV				=			server
+FILE_SV				=			server \
+								minitalk_utils
 
 SRC_CL				+=			$(addprefix $(SRCS_DIR), $(addsuffix .c, $(FILE_CL)))
 
