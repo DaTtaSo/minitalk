@@ -34,14 +34,14 @@ void	error_signal(int sig_num, int pid)
 	}
 }
 
-void	send_len(int pid, int len)
+void	send_len(int pid, unsigned int len)
 {
 	int	i;
 
 	i = 0;
 	while (i < 32)
 	{
-		g_signal_received = 0;
+		__atomic_store_n(&g_signal_received, 0, __ATOMIC_RELEASE);
 		if ((len & (1 << i)))
 		{
 			if (kill(pid, SIGUSR1) == -1)
@@ -105,6 +105,5 @@ int	main(int ac, char **av)
 	sigaction(SIGUSR1, &sa, NULL);
 	send_len(pid, ft_strlen(av[2]));
 	send_str(pid, av[2]);
-	send_str(pid, "\0");
 	return (0);
 }

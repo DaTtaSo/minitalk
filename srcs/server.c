@@ -27,7 +27,7 @@ void	filler(int sig, int *bit, char *str)
 	}
 }
 
-void	print_reset(char **str, int *bit, int *len, int *received)
+void	print_reset(char **str, int *bit, unsigned int *len, int *received)
 {
 	ft_putendl_fd(*str, 1);
 	*bit = 0;
@@ -37,7 +37,7 @@ void	print_reset(char **str, int *bit, int *len, int *received)
 	*str = NULL;
 }
 
-void	signal_handler_bis(char *str, int *bit, int *len, int *received)
+void	sig_handler_b(char *str, int *bit, unsigned int *len, int *received)
 {
 	static int	char_count = 0;
 
@@ -54,10 +54,10 @@ void	signal_handler_bis(char *str, int *bit, int *len, int *received)
 
 void	signal_handler(int sig, siginfo_t *info, void *context)
 {
-	static int	bit = 0;
-	static int	received = 0;
-	static int	len = 0;
-	static char	*str = NULL;
+	static int			bit = 0;
+	static int			received = 0;
+	static unsigned int	len = 0;
+	static char			*str = NULL;
 
 	(void)context;
 	if (!received)
@@ -73,7 +73,7 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 	else if (str != NULL)
 	{
 		filler(sig, &bit, str);
-		signal_handler_bis(str, &bit, &len, &received);
+		sig_handler_b(str, &bit, &len, &received);
 	}
 	kill(info->si_pid, SIGUSR1);
 }

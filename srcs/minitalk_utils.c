@@ -30,7 +30,7 @@ void	ft_strcat(char *str, char c)
 	str[i + 1] = '\0';
 }
 
-void	get_len(int sig, int *bit, int *len, int *received)
+void	get_len(int sig, int *bit, unsigned int *len, int *received)
 {
 	if (sig == SIGUSR1)
 		*len |= 1 << *bit;

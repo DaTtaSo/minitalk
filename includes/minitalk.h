@@ -19,19 +19,19 @@
 /*client*/
 void	send_str(int pid, char *str);
 void	signal_received(int sig);
-void	send_len(int pid, int len);
+void	send_len(int pid, unsigned int len);
 void	error_signal(int sig_num, int pid);
 
 /*server*/
 void	signal_handler(int sig, siginfo_t *info, void *context);
 void	terminate(int sig);
 void	filler(int sig, int *bit, char *str);
-void	signal_handler_bis(char *str, int *bit, int *len, int *received);
+void	sig_handler_b(char *str, int *bit, unsigned int *len, int *received);
 
 /*utils*/
 void	error_signal_utils(void);
 void	ft_strcat(char *str, char c);
-void	get_len(int sig, int *bit, int *len, int * received);
-void	print_reset(char **str, int *bit, int *len, int *received);
+void	get_len(int sig, int *bit, unsigned int *len, int * received);
+void	print_reset(char **str, int *bit, unsigned int *len, int *received);
 
 #endif
