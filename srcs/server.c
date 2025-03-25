@@ -27,27 +27,29 @@ void	filler(int sig, int *bit, char *str)
 	}
 }
 
-void	get_len(int sig, int *bit, int *len, int *received)
-{
-	if (sig == SIGUSR1)
-		*len |= 1 << *bit;
-	(*bit)++;
-	if (*bit == 32)
-	{
-		*bit = 0;
-		*received = 1;
-	}
-}
-
 void	print_reset(char **str, int *bit, int *len, int *received)
 {
 	ft_putendl_fd(*str, 1);
 	*bit = 0;
-
 	*len = 0;
 	*received = 0;
 	free(*str);
 	*str = NULL;
+}
+
+void	signal_handler_bis(char *str, int *bit, int *len, int *received)
+{
+	static int	char_count = 0;
+
+	if (*bit == 0 && received)
+	{
+		char_count++;
+		if (char_count == *len)
+		{
+			print_reset(&str, bit, len, received);
+			char_count = 0;
+		}
+	}
 }
 
 void	signal_handler(int sig, siginfo_t *info, void *context)
@@ -56,31 +58,22 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 	static int	received = 0;
 	static int	len = 0;
 	static char	*str = NULL;
-	static int	char_count = 0;
 
 	(void)context;
-	if (received == 0)
+	if (!received)
 	{
 		get_len(sig, &bit, &len, &received);
 		if (received == 1)
 		{
 			str = ft_calloc(len + 1, sizeof(char));
-			if (str == NULL)
+			if (!str)
 				exit(1);
 		}
 	}
 	else if (str != NULL)
 	{
 		filler(sig, &bit, str);
-		if (bit == 0 && received)
-		{
-			char_count++;
-			if (char_count == len)
-			{
-				print_reset(&str, &bit, &len, &received);
-				char_count = 0;
-			}
-		}
+		signal_handler_bis(str, &bit, &len, &received);
 	}
 	kill(info->si_pid, SIGUSR1);
 }

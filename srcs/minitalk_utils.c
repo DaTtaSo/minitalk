@@ -29,3 +29,21 @@ void	ft_strcat(char *str, char c)
 	str[i] = c;
 	str[i + 1] = '\0';
 }
+
+void	get_len(int sig, int *bit, int *len, int *received)
+{
+	if (sig == SIGUSR1)
+		*len |= 1 << *bit;
+	(*bit)++;
+	if (*bit == 32)
+	{
+		*bit = 0;
+		*received = 1;
+	}
+}
+
+void	error_signal_utils(void)
+{
+	ft_putendl_fd("Error", 2);
+	exit(1);
+}

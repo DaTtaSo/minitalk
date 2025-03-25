@@ -14,7 +14,8 @@ CFLAGS				=		-Wall -Werror -MMD -MP -g3
 
 SRCS_DIR			=			srcs/
 
-FILE_CL				=			client
+FILE_CL				=			client \
+								minitalk_utils
 
 FILE_SV				=			server \
 								minitalk_utils

@@ -16,18 +16,21 @@
 # include <signal.h>
 # include "./libft/libft.h"
 
-/*client.c*/
-void	send_char(int pid, char *str);
-void	error_signal(void);
+/*client*/
+void	send_str(int pid, char *str);
 void	signal_received(int sig);
 void	send_len(int pid, int len);
+void	error_signal(int sig_num, int pid);
 
-/*server.c*/
+/*server*/
 void	signal_handler(int sig, siginfo_t *info, void *context);
 void	terminate(int sig);
-
-void	ft_strcat(char *str, char c);
 void	filler(int sig, int *bit, char *str);
+void	signal_handler_bis(char *str, int *bit, int *len, int *received);
+
+/*utils*/
+void	error_signal_utils(void);
+void	ft_strcat(char *str, char c);
 void	get_len(int sig, int *bit, int *len, int * received);
 void	print_reset(char **str, int *bit, int *len, int *received);
 

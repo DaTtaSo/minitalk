@@ -17,15 +17,21 @@ volatile sig_atomic_t	g_signal_received = 0;
 void	signal_received(int sig)
 {
 	if (sig == SIGUSR1)
-	{
 		__atomic_store_n(&g_signal_received, 1, __ATOMIC_RELEASE);
-	}
 }
 
-void	error_signal(void)
+void	error_signal(int sig_num, int pid)
 {
-	ft_putendl_fd("Error", 2);
-	exit(1);
+	if (sig_num == 1)
+	{
+		if (kill(pid, SIGUSR1) == -1)
+			error_signal_utils();
+	}
+	if (sig_num == 2)
+	{
+		if (kill(pid, SIGUSR2) == -1)
+			error_signal_utils();
+	}
 }
 
 void	send_len(int pid, int len)
@@ -36,15 +42,15 @@ void	send_len(int pid, int len)
 	while (i < 32)
 	{
 		g_signal_received = 0;
-		if ((len & (1 << i)) != 0)
+		if ((len & (1 << i)))
 		{
 			if (kill(pid, SIGUSR1) == -1)
-				error_signal();
+				error_signal_utils();
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-				error_signal();
+				error_signal_utils();
 		}
 		while (!__atomic_load_n(&g_signal_received, __ATOMIC_ACQUIRE))
 			usleep(100);
@@ -52,7 +58,7 @@ void	send_len(int pid, int len)
 	}
 }
 
-void	send_char(int pid, char *str)
+void	send_str(int pid, char *str)
 {
 	int	bit;
 	int	i;
@@ -64,16 +70,10 @@ void	send_char(int pid, char *str)
 		while (bit >= 0)
 		{
 			g_signal_received = 0;
-			if ((str[i] & (1 << bit)) != 0)
-			{
-				if (kill(pid, SIGUSR1) == -1)
-					error_signal();
-			}
+			if ((str[i] & (1 << bit)))
+				error_signal(1, pid);
 			else
-			{
-				if (kill(pid, SIGUSR2) == -1)
-					error_signal();
-			}
+				error_signal(2, pid);
 			while (!__atomic_load_n(&g_signal_received, __ATOMIC_ACQUIRE))
 				usleep(100);
 			bit--;
@@ -104,6 +104,7 @@ int	main(int ac, char **av)
 	sa.sa_flags = 0;
 	sigaction(SIGUSR1, &sa, NULL);
 	send_len(pid, ft_strlen(av[2]));
-	send_char(pid, av[2]);
+	send_str(pid, av[2]);
+	send_str(pid, "\0");
 	return (0);
 }
