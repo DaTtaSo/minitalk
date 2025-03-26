@@ -31,7 +31,7 @@ void	sig_handler_b(char *str, int *bit, unsigned int *len, int *received);
 /*utils*/
 void	error_signal_utils(void);
 void	ft_strcat(char *str, char c);
-void	get_len(int sig, int *bit, unsigned int *len, int * received);
+void	get_len(int sig, int *bit, unsigned int *len, int *received);
 void	print_reset(char **str, int *bit, unsigned int *len, int *received);
 
 #endif
